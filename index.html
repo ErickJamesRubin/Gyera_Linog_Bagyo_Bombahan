@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <title>ORBITAL SENTINEL — Global Crisis Monitor</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700;900&family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<!-- ══════════════════════════════════
+     AUTH SCREEN
+══════════════════════════════════ -->
+<div id="auth-screen">
+  <div class="auth-bg">
+    <div class="auth-stars"></div>
+    <div class="auth-planet"></div>
+    <div class="auth-orbit"></div>
+    <div class="auth-orbit auth-orbit-2"></div>
+  </div>
+
+  <div class="auth-container">
+    <div class="auth-logo">
+      <div class="auth-logo-icon">🛰️</div>
+      <div class="auth-logo-name">ORBITAL SENTINEL</div>
+      <div class="auth-logo-sub">Global Crisis Monitoring Platform · Low Earth Orbit</div>
+    </div>
+
+    <!-- Login Panel -->
+    <div class="auth-panel" id="panel-login">
+      <div class="auth-panel-title">OPERATOR LOGIN</div>
+      <div class="auth-field">
+        <label>USERNAME</label>
+        <input type="text" id="login-user" placeholder="operator_id" autocomplete="off"/>
+      </div>
+      <div class="auth-field">
+        <label>PASSWORD</label>
+        <input type="password" id="login-pass" placeholder="••••••••••••" autocomplete="off"/>
+      </div>
+      <div class="auth-error" id="login-error"></div>
+      <button class="auth-btn" id="btn-login">▶ AUTHENTICATE</button>
+      <div class="auth-switch">No account? <span class="auth-link" id="go-signup">Register Operator</span></div>
+    </div>
+
+    <!-- Signup Panel -->
+    <div class="auth-panel hidden" id="panel-signup">
+      <div class="auth-panel-title">REGISTER OPERATOR</div>
+      <div class="auth-field">
+        <label>USERNAME</label>
+        <input type="text" id="signup-user" placeholder="choose_callsign" autocomplete="off"/>
+      </div>
+      <div class="auth-field">
+        <label>PASSWORD</label>
+        <input type="password" id="signup-pass" placeholder="must be: password123"/>
+      </div>
+      <div class="auth-field">
+        <label>CONFIRM PASSWORD</label>
+        <input type="password" id="signup-confirm" placeholder="repeat password"/>
+      </div>
+      <div class="auth-error" id="signup-error"></div>
+      <button class="auth-btn" id="btn-signup">✔ CREATE ACCOUNT</button>
+      <div class="auth-switch">Have an account? <span class="auth-link" id="go-login">Sign In</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     MAIN APP (hidden until login)
+══════════════════════════════════ -->
+<div id="app" class="hidden">
+
+  <!-- Scanlines -->
+  <div class="scanlines"></div>
+
+  <!-- ── TOP NAV BAR ── -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <span class="topbar-icon">🛰️</span>
+      <div class="topbar-brand">
+        <span class="topbar-name">ORBITAL SENTINEL</span>
+        <span class="topbar-sub">GLOBAL CRISIS MONITOR</span>
+      </div>
+    </div>
+    <div class="topbar-center">
+      <div class="status-pill" id="pill-wars">
+        <span class="pill-dot war-dot"></span>
+        <span>CONFLICTS: <strong id="war-count">0</strong></span>
+      </div>
+      <div class="status-pill" id="pill-typhoons">
+        <span class="pill-dot typhoon-dot"></span>
+        <span>TYPHOONS: <strong id="typhoon-count">0</strong></span>
+      </div>
+      <div class="status-pill" id="pill-quakes">
+        <span class="pill-dot quake-dot"></span>
+        <span>EARTHQUAKES: <strong id="quake-count">0</strong></span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-user">
+        <span class="user-icon">👤</span>
+        <span id="topbar-username">OPERATOR</span>
+      </div>
+      <button class="tb-btn sound-btn" id="btn-sound">🔊</button>
+
+      <!-- ── ALERT BELL ── -->
+      <div class="alert-bell-wrap" id="alert-bell-wrap">
+        <button class="tb-btn alert-bell-btn" id="btn-alert-bell" title="Alerts">
+          🔔 <span class="alert-badge hidden" id="alert-badge">0</span>
+        </button>
+        <!-- Dropdown feed -->
+        <div class="alert-feed hidden" id="alert-feed">
+          <div class="alert-feed-header">
+            <span>⚠ SYSTEM ALERTS</span>
+            <button id="btn-clear-alerts">CLEAR ALL</button>
+          </div>
+          <div class="alert-feed-list" id="alert-feed-list">
+            <div class="alert-feed-empty">No alerts</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="tb-btn logout-btn" id="btn-logout">⏏ LOGOUT</button>
+    </div>
+  </header>
+
+  <!-- ── SIDE PANEL (left) ── -->
+  <aside class="side-panel" id="side-panel">
+    <div class="sp-header">
+      <span>🌐 ACTIVE EVENTS</span>
+      <button class="sp-close" id="sp-close">✕</button>
+    </div>
+
+    <div class="sp-section">
+      <div class="sp-section-title">⚔ CONFLICT ZONES</div>
+      <div id="war-list" class="sp-list"></div>
+    </div>
+    <div class="sp-section">
+      <div class="sp-section-title">🌀 TYPHOON SYSTEMS</div>
+      <div id="typhoon-list" class="sp-list"></div>
+    </div>
+    <div class="sp-section">
+      <div class="sp-section-title">🌋 SEISMIC EVENTS</div>
+      <div id="quake-list" class="sp-list"></div>
+    </div>
+  </aside>
+  <button class="sp-toggle" id="sp-toggle">📋 EVENTS</button>
+
+  <!-- ── MAP ── -->
+  <div id="map"></div>
+
+  <!-- ── STRIKE CONSOLE (bottom bar) ── -->
+  <div class="strike-console">
+    <div class="sc-label">🎯 ORBITAL STRIKE CONSOLE</div>
+    <div class="sc-controls">
+      <button class="sc-btn" id="btn-spawn-typhoon">🌀 SIMULATE TYPHOON</button>
+      <button class="sc-btn" id="btn-spawn-quake">🌋 SIMULATE QUAKE</button>
+      <button class="sc-btn danger" id="btn-orbital-strike">☄ ORBITAL STRIKE MODE
+        <span class="strike-mode-indicator" id="strike-indicator">OFF</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── PROGRESS BAR ── -->
+  <div id="progress-wrap"><div id="progress-bar"></div></div>
+
+  <!-- ── DETAIL PANEL (slides in from right) ── -->
+  <div class="detail-panel hidden" id="detail-panel">
+    <div class="dp-header">
+      <span id="dp-title">EVENT DETAILS</span>
+      <button id="dp-close">✕</button>
+    </div>
+    <div id="dp-content"></div>
+  </div>
+
+  <!-- ── TOAST ── -->
+  <div id="toast"></div>
+
+  <!-- ── EXPLOSION FX ── -->
+  <div id="explosion-fx">☄</div>
+
+
+</div><!-- /#app -->
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
