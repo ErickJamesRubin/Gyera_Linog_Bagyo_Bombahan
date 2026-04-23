@@ -206,4 +206,5 @@ Built as a creative web application project. All crisis data is fictional and fo
 ---
 
 *ORBITAL SENTINEL · Global Crisis Monitoring Platform · v1.0*  
-*Stack: HTML5 · CSS3 · Vanilla JS · Leaflet.js · Web Audio API*
+*Stack: HTML5 · CSS3 · Vanilla JS · Leaflet.js · Web Audio API*  
+*Last updated: April 23, 2026*
