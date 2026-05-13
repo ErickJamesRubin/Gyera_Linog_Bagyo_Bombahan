@@ -2,7 +2,7 @@
  * ORBITAL SENTINEL — script.js
  * Global Crisis Monitoring Platform
  * Initial build: April 16, 2026
- * Last updated: April 23, 2026
+ * Last updated: May 13, 2026
  */
 
 // ══════════════════════════════════════
